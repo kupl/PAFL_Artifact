@@ -1,0 +1,13 @@
+*.dSYM
+.DS_Store
+.vscode/
+
+profile/
+build/**
+!build/cmake.sh
+!build/make.sh
+
+data/**
+!data/**/cpp_peglib/
+__pafl__/**
+!__pafl__/cache.cereal
