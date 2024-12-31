@@ -6,11 +6,8 @@ profile/
 build/**
 !build/cmake.sh
 !build/make.sh
+# data/
 
-data/**
-!data/
-!data/**/
-!data/**/cpp_peglib/
 __pafl__/**
 !__pafl__/
 !__pafl__/cache.cereal
