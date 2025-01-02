@@ -177,7 +177,8 @@ def main() -> int:
     Method = Args.Method
     Proj = Args.Proj
     Updater = Args.Updater
-    Profile = f"{Method}-{Proj}" + ("" if Updater is None else f"-{Updater}")
+    UpdaterWithPrefix = f"1{Updater}" if Updater is not None else ""
+    Profile = f"{Method}-{Proj}" + ("" if Updater is None else f"-{UpdaterWithPrefix}")
     PAFLname = "PAFL" + ("" if Updater is None else f" ({Updater})")
 
     CoverageDir = f"/workspace/data/coverage/{Proj}"
@@ -213,7 +214,7 @@ def main() -> int:
     # dict keys: AvgFR, AvgAR, Top-1, Top-5, Top-10
     PAFLTotal: dict[str, int | float] = BaselineTotal.copy()
 
-    for idx, version in enumerate(SortedVersion[Proj], 1):
+    for version in SortedVersion[Proj]:
         # Read fault locations
         CoveredLines: list[tuple[str, str]] = list()
         CoveredFaults: set[tuple[str, int]] = set()

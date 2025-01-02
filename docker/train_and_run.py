@@ -184,14 +184,12 @@ def main() -> int:
     Proj = Args.Proj
     Thread = Args.Thread if Args.Thread > 0 else 1
     Updater = Args.Updater
-    Profile = f"{Method}-{Proj}" + ("" if Updater is None else f"-{Updater}")
+    UpdaterWithPrefix = f"1{Updater}" if Updater is not None else ""
+    Profile = f"{Method}-{Proj}" + ("" if Updater is None else f"-{UpdaterWithPrefix}")
     CoverageDir = f"/workspace/data/coverage/{Proj}"
 
     if Proj not in SortedVersion:
         print(f"Invalid project: {Proj}")
-        return 1
-    if Thread < 1:
-        print(f"Invalid number of thread: {Thread}")
         return 1
 
     if Method in AENEAS:
@@ -206,7 +204,7 @@ def main() -> int:
 
     # Init profile
     os.system(
-        f"pafl profile {Profile} {'py' if Proj in PythonProjects else 'cpp'} {Method if Method in SBFL else 'custom'} {'' if Updater is None else Updater}"
+        f"pafl profile {Profile} {'py' if Proj in PythonProjects else 'cpp'} {Method if Method in SBFL else 'custom'} {UpdaterWithPrefix}"
     )
     os.system(f"pafl profile-reset {Profile}")
 
@@ -227,24 +225,40 @@ def main() -> int:
     # Run Baseline FL method
     BaselineTime = time.time()
     for idx, ver in enumerate(SortedVersion[Proj], 1):
-        os.system(
-            f"pafl run-base -P {Profile} {setSource(ver)} {setCoverage(ver)} {setCustomSus(idx)} -c"
-        )
+        if (
+            os.system(
+                f"pafl run-base -P {Profile} {setSource(ver)} {setCoverage(ver)} {setCustomSus(idx)} -c"
+            )
+            != 0
+        ):
+            return 1
     BaselineTime = time.time() - BaselineTime
 
     # Run PAFL
     PAFLTime = time.time()
     for idx, ver in enumerate(SortedVersion[Proj][:-1], 1):
-        os.system(
-            f"pafl run-pafl -P {Profile} {setSource(ver)} {setCoverage(ver)} {setCustomSus(idx)} --thread {Thread} -c"
-        )
-        os.system(
-            f"pafl train -P {Profile} {setSource(ver)} {setCoverage(ver)} {setOracle(ver)} {setCustomSus(idx)} --thread {Thread} -c"
-        )
+        if (
+            os.system(
+                f"pafl run-pafl -P {Profile} {setSource(ver)} {setCoverage(ver)} {setCustomSus(idx)} --thread {Thread} -c"
+            )
+            != 0
+        ):
+            return 1
+        if (
+            os.system(
+                f"pafl train -P {Profile} {setSource(ver)} {setCoverage(ver)} {setOracle(ver)} {setCustomSus(idx)} --thread {Thread} -c"
+            )
+            != 0
+        ):
+            return 1
     ver = SortedVersion[Proj][-1]
-    os.system(
-        f"pafl run-pafl -P {Profile} {setSource(ver)} {setCoverage(ver)} {setCustomSus(len(SortedVersion[Proj]))} --thread {Thread} -c"
-    )
+    if (
+        os.system(
+            f"pafl run-pafl -P {Profile} {setSource(ver)} {setCoverage(ver)} {setCustomSus(len(SortedVersion[Proj]))} --thread {Thread} -c"
+        )
+        != 0
+    ):
+        return 1
     PAFLTime = time.time() - PAFLTime
 
     # Display execution time
@@ -263,4 +277,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    main()
+    if main() != 0:
+        print("Error occurred")
+        os.abort()

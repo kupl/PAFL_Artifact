@@ -236,17 +236,20 @@ def main() -> int:
                 FirstRanking = LineRanking["total"]
             FRList.append(FirstRanking)
 
+    Improvement = sum(1 for x, y in zip(BaselineFRList, PAFLFRList) if x >= y)
+    Total = len(BaselineFRList)
+
     # Print total metrics
     Buffer: list[str] = list()
     Buffer.append(f"Baseline FL: {Method}")
     Buffer.append(f"Target project: {Proj}")
-    Buffer.append(
-        f"Updater config: {Updater if Updater is not None else 'default (11111)'}"
-    )
+    # Buffer.append(
+    #     f"Updater config: {Updater if Updater is not None else 'default (11111)'}"
+    # )
     print("\n".join(Buffer))
     plotDot(max([len(line) for line in Buffer]))
     print(
-        f"Acheiving  equal or better FR in {sum(1 for x, y in zip(BaselineFRList, PAFLFRList) if x >= y)} out of {len(BaselineFRList)} versions"
+        f"Acheiving equal or better FR in {Improvement} out of {Total} ({round(Improvement * 100 / Total)}%) versions"
     )
 
 

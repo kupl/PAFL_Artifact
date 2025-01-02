@@ -32,12 +32,13 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN pyinstaller --onefile evaluate.py
 RUN pyinstaller --onefile train_and_run.py
 RUN pyinstaller --onefile robustness.py
+RUN pyinstaller --onefile evalDLFL.py
 
-RUN cp dist/evaluate dist/train_and_run dist/robustness ./
-RUN rm evaluate.spec train_and_run.spec robustness.spec \
-    evaluate.py train_and_run.py robustness.py
+RUN cp dist/evaluate dist/train_and_run dist/robustness dist/evalDLFL ./
+RUN rm evaluate.spec train_and_run.spec robustness.spec evalDLFL.spec \
+    evaluate.py train_and_run.py robustness.py evalDLFL.py
 RUN rm -rf dist && chmod +x \
-    evaluate train_and_run robustness
+    evaluate train_and_run robustness evalDLFL
 ENV PATH="/opt/PAFL/:${PATH}"
 
 RUN mkdir --mode=777 /workspace
