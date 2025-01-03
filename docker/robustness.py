@@ -136,10 +136,6 @@ SortedVersion["youtube-dl"] = (
     + [3, 16, 2, 15, 1, 13, 12, 11]
 )
 
-SBFL: list[str] = ["ochiai", "dstar", "barinel"]
-AENEAS: list[str] = ["aeneas-ochiai", "aeneas-dstar", "aeneas-barinel"]
-DLFL: list[str] = [f"{DL}-{Num}" for DL in ["CNN", "RNN", "MLP"] for Num in range(1, 6)]
-
 
 def plotDot(Iteration: int) -> None:
     print("-" * Iteration)
@@ -189,9 +185,6 @@ def main() -> int:
         lambda version: f"{CoverageDir}/buggy-{version}/__pafl__/{Profile}-pafl"
     )
 
-    if Method not in SBFL + AENEAS + DLFL:
-        print(f"Invalid method: {Method}")
-        return 1
     if Proj not in SortedVersion:
         print(f"Invalid project: {Proj}")
         return 1

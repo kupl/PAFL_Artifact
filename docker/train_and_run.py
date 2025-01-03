@@ -174,7 +174,7 @@ def main() -> int:
         "--updater",
         dest="Updater",
         type=str,
-        default=None,
+        default="1111",
         action="store",
         help="Updater configuration",
     )
@@ -183,9 +183,8 @@ def main() -> int:
     Method = Args.Method
     Proj = Args.Proj
     Thread = Args.Thread if Args.Thread > 0 else 1
-    Updater = Args.Updater
-    UpdaterWithPrefix = f"1{Updater}" if Updater is not None else ""
-    Profile = f"{Method}-{Proj}" + ("" if Updater is None else f"-{UpdaterWithPrefix}")
+    Updater = f"1{Args.Updater}" if Args.Updater != "1111" else ""
+    Profile = f"{Method}-{Proj}" + ("-" if Updater != "" else "") + Updater
     CoverageDir = f"/workspace/data/coverage/{Proj}"
 
     if Proj not in SortedVersion:
@@ -199,12 +198,11 @@ def main() -> int:
     elif Method in SBFL:
         CustomSusDir = None
     else:
-        print(f"Invalid method: {Method}")
-        return 1
+        CustomSusDir = f"/workspace/data/coverage/{Method}/{Proj}"
 
     # Init profile
     os.system(
-        f"pafl profile {Profile} {'py' if Proj in PythonProjects else 'cpp'} {Method if Method in SBFL else 'custom'} {UpdaterWithPrefix}"
+        f"pafl profile {Profile} {'py' if Proj in PythonProjects else 'cpp'} {Method if Method in SBFL else 'custom'} {Updater}"
     )
     os.system(f"pafl profile-reset {Profile}")
 
